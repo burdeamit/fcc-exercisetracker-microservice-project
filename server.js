@@ -13,6 +13,7 @@ mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   useCreateIndex: true,
+  useFindAndModify: false,
 });
 
 // MongoDB connection confirmation and error handling
@@ -127,7 +128,50 @@ app.get("/api/users", async (req, res) => {
 * will be the user object with the exercise fields added.
 */
 
-app.post("/api/users/:_id/exercises", (req, res) => {});
+app.post("/api/users/:_id/exercises", (req, res) => {
+  var exerciseDate;
+  if (!req.body.date) {
+    exerciseDate = new Date();
+  } else {
+    exerciseDate = new Date(req.body.date);
+  }
+
+  var newExercise = {
+    date: exerciseDate,
+    duration: parseInt(req.body.duration),
+    description: req.body.description,
+  };
+
+  User.findByIdAndUpdate(
+    req.body[":_id"],
+    { $push: { log: newExercise } },
+    { new: true },
+    (err, userUpdate) => {
+      if (err) {
+        console.error(err);
+        res.send(err);
+      } else {
+        if (!userUpdate) {
+          res.json({
+            error: "_id does not exist",
+          });
+        } else {
+          console.log(`newExercise : ${newExercise}`);
+          console.log(`exerciseDate : ${exerciseDate}`);
+          console.log(`newExercise.date: ${newExercise.date}`);
+
+          res.json({
+            _id: userUpdate._id,
+            username: userUpdate.username,
+            date: newExercise.date.toDateString(),
+            duration: newExercise.duration,
+            description: newExercise.description,
+          });
+        }
+      }
+    }
+  );
+});
 
 /*
 ? TEST 5.1
