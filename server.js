@@ -159,14 +159,14 @@ app.post("/api/users/:_id/exercises", (req, res) => {
           console.log(`newExercise : ${newExercise}`);
           console.log(`exerciseDate : ${exerciseDate}`);
           console.log(`newExercise.date: ${newExercise.date}`);
-
-          res.json({
+          let newExerciseApiObj = {
             _id: userUpdate._id,
             username: userUpdate.username,
-            date: newExercise.date.toDateString(),
+            date: new Date(newExercise.date).toDateString(),
             duration: newExercise.duration,
             description: newExercise.description,
-          });
+          };
+          res.json(newExerciseApiObj);
         }
       }
     }
