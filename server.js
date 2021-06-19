@@ -129,18 +129,15 @@ app.get("/api/users", async (req, res) => {
 */
 
 app.post("/api/users/:_id/exercises", (req, res) => {
-  var exerciseDate;
-  if (!req.body.date) {
-    exerciseDate = new Date();
-  } else {
-    exerciseDate = new Date(req.body.date);
-  }
-
   var newExercise = {
-    date: exerciseDate,
+    date: req.body.date,
     duration: parseInt(req.body.duration),
     description: req.body.description,
   };
+
+  if (!req.body.date) {
+    newExercise.date = new Date();
+  }
 
   User.findByIdAndUpdate(
     req.body[":_id"],
@@ -156,9 +153,6 @@ app.post("/api/users/:_id/exercises", (req, res) => {
             error: "_id does not exist",
           });
         } else {
-          console.log(`newExercise : ${newExercise}`);
-          console.log(`exerciseDate : ${exerciseDate}`);
-          console.log(`newExercise.date: ${newExercise.date}`);
           let newExerciseApiObj = {
             _id: userUpdate._id,
             username: userUpdate.username,
