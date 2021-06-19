@@ -77,7 +77,29 @@ app.get("/hello", (req, res) => {
 * and _id properties.
 */
 
-app.post("/api/users", (req, res) => {});
+app.post("/api/users", (req, res) => {
+  if (req.body.username === "") {
+    res.json({ error: "Please enter username" });
+  } else {
+    let searchUser = User.findOne(
+      { username: req.body.username },
+      (err, searchResult) => {
+        if (searchResult) {
+          res.json({ error: "Username already taken" });
+        } else {
+          let newUser = new User({
+            username: req.body.username,
+          });
+          newUser.save();
+          res.json({
+            _id: newUser._id,
+            username: newUser.username,
+          });
+        }
+      }
+    );
+  }
+});
 
 /*
 ? TEST 3
@@ -92,7 +114,6 @@ app.get("/api/users", async (req, res) => {
       console.error(err);
       res.send(err);
     } else {
-      console.log(resultDocs);
       res.json(resultDocs);
     }
   });
