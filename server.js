@@ -154,11 +154,11 @@ app.post("/api/users/:_id/exercises", (req, res) => {
           });
         } else {
           let newExerciseApiObj = {
-            _id: userUpdate._id,
             username: userUpdate.username,
-            date: new Date(newExercise.date).toDateString(),
-            duration: newExercise.duration,
             description: newExercise.description,
+            duration: newExercise.duration,
+            _id: userUpdate._id,
+            date: new Date(newExercise.date).toDateString(),
           };
           res.json(newExerciseApiObj);
         }
