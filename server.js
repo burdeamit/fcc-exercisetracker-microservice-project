@@ -38,7 +38,7 @@ const usersSchema = new Schema({
   count: {
     type: Number,
   },
-  log: exerciseSchema,
+  log: [exerciseSchema],
 });
 
 // Model
@@ -174,7 +174,7 @@ app.post("/api/users/:_id/exercises", (req, res) => {
 * object with a log array of all the exercises added. Each log item has 
 * the description, duration, and date properties.
 
-? TEST 5.2
+? TEST 5.2 
 * A request to a user's log (/api/users/:_id/logs) returns an object 
 * with a count property representing the number of exercises returned.
 
@@ -184,7 +184,22 @@ app.post("/api/users/:_id/exercises", (req, res) => {
 * in yyyy-mm-dd format. limit is an integer of how many logs to send back.
 */
 
-app.get("/api/users/:_id/logs", (req, res) => {});
+app.get("/api/users/:_id/logs", (req, res) => {
+  User.findById(req.params._id, (err, searchResult) => {
+    if (err) {
+      res.json({
+        error: "_id does not exist",
+      });
+    } else {
+      res.json({
+        _id: searchResult._id,
+        username: searchResult.username,
+        count: searchResult.log.length,
+        log: searchResult.log,
+      });
+    }
+  });
+});
 
 const listener = app.listen(process.env.PORT || 3000, () => {
   console.log("Your app is listening on port " + listener.address().port);
