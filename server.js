@@ -186,9 +186,9 @@ app.post("/api/users/:_id/exercises", (req, res) => {
 
 app.get("/api/users/:_id/logs", (req, res) => {
   let userId = req.params._id;
-  let from;
-  let to;
-  let limit;
+  // let from;
+  // let to;
+  // let limit;
   User.findById(userId, (err, searchResult) => {
     if (err) {
       res.json({
@@ -204,31 +204,43 @@ app.get("/api/users/:_id/logs", (req, res) => {
         to = new Date(req.query.to).getTime();
       }
 
-      // *duplicate the log to new array
-
-      let exerciseLog = searchResult.log;
-
       /*
        * Filter of Array will be done using the EPOCH date
        */
 
-      exerciseLog = exerciseLog.filter((filteredLogs) => {
-        let exerciseDate = new Date(filteredLogs.date).getTime();
-        return exerciseDate >= from && exerciseDate <= to;
-      });
+      if (req.query.from !== undefined && req.query.to !== undefined) {
+        searchResult.log = searchResult.log.filter((filteredLogs) => {
+          let exerciseDate = new Date(filteredLogs.date).getTime();
+          return exerciseDate >= from && exerciseDate <= to;
+        });
+      }
+
+      if (req.query.from !== undefined) {
+        searchResult.log = searchResult.log.filter((filteredLogs) => {
+          let exerciseDate = new Date(filteredLogs.date).getTime();
+          return exerciseDate >= from;
+        });
+      }
+
+      if (req.query.to !== undefined) {
+        searchResult.log = searchResult.log.filter((filteredLogs) => {
+          let exerciseDate = new Date(filteredLogs.date).getTime();
+          return exerciseDate <= to;
+        });
+      }
 
       // * limiting the results of filtered logs
 
-      if (req.query.limit) {
+      if (req.query.limit !== undefined) {
         limit = req.query.limit;
-        exerciseLog = exerciseLog.slice(0, limit);
+        searchResult.log = searchResult.log.slice(0, limit);
       }
 
       res.json({
         _id: searchResult._id,
         username: searchResult.username,
         count: searchResult.log.length,
-        log: exerciseLog,
+        log: searchResult.log,
       });
     }
   });
