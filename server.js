@@ -185,18 +185,20 @@ app.post("/api/users/:_id/exercises", (req, res) => {
 */
 
 app.get("/api/users/:_id/logs", (req, res) => {
-  User.findById(req.params._id, (err, searchResult) => {
+  let userId = req.params._id;
+  if (req.query) {
+    let from = req.query.from;
+    let to = req.query.to;
+    let limit = req.query.limit;
+  }
+
+  User.findById(userId, (err, searchResult) => {
     if (err) {
       res.json({
         error: "_id does not exist",
       });
     } else {
-      res.json({
-        _id: searchResult._id,
-        username: searchResult.username,
-        count: searchResult.log.length,
-        log: searchResult.log,
-      });
+      res.json(searchResult);
     }
   });
 });
