@@ -198,7 +198,12 @@ app.get("/api/users/:_id/logs", (req, res) => {
         error: "_id does not exist",
       });
     } else {
-      res.json(searchResult);
+      res.json({
+        _id: searchResult._id,
+        username: searchResult.username,
+        count: searchResult.log.length,
+        log: searchResult.log,
+      });
     }
   });
 });
